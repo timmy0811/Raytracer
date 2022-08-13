@@ -41,49 +41,7 @@ public:
 	{
 	}
 
-	ImVec4 getIntersection(Ray ray) {
-		ImVec4 rayPos = ray.getSource();
-		ImVec4 rayDir = ray.getDirection();
-
-		// Calculate a, b, c
-		// a = (bx^2 + by^2 + bz^2)
-		float a = pow(rayDir.x, 2) + pow(rayDir.y, 2) + pow(rayDir.z, 2);
-
-		// b = 1axbx + 2ayby + 2azbz - bxa - byb - bzc
-		float b = (2 * rayPos.x * rayDir.x) + (2 * rayPos.y * rayDir.y) + (2 * rayPos.z * rayDir.z) - rayDir.x * position.x - rayDir.y * position.y - rayDir.z * position.z;
-
-		// c = ax^2 + ay^2 + az^2 - axa - ayb - azc
-		float c = pow(rayPos.x, 2) + pow(rayPos.y, 2) + pow(rayPos.z, 2) - rayPos.x * position.x - rayPos.y * position.y - rayPos.z * position.z;
-
-		// Determine solutions
-		float disc = pow(b, 2) - 4 * a * c;
-		if (disc > 0) {
-			float t1 = (-b + sqrt(disc)) / (2 * a);
-			float t2 = (-b - sqrt(disc)) / (2 * a);
-
-			float lowerT = std::min(t1, t2);
-
-			ImVec4 p;
-			p.x = rayPos.x + rayDir.x * lowerT;
-			p.y = rayPos.y + rayDir.y * lowerT;
-			p.z = rayPos.z + rayDir.z * lowerT;
-
-			return p;
-		}
-		else if (disc == 0) {
-			float t1 = -b / (2 * a);
-
-			ImVec4 p;
-			p.x = rayPos.x + rayDir.x * t1;
-			p.y = rayPos.y + rayDir.y * t1;
-			p.z = rayPos.z + rayDir.z * t1;
-
-			return p;
-		}
-		else {
-			return{};
-		}
-	}
+	ImVec4 getIntersection(Ray ray);
 };
 
 class ExampleLayer : public Walnut::Layer

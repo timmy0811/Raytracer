@@ -3,7 +3,7 @@
 #include "Walnut/Image.h"
 
 #include <memory>
-#include "glm/vec2.hpp"
+#include "glm/glm.hpp"
 
 class Renderer
 {
