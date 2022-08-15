@@ -59,26 +59,6 @@ private:
 
 		m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
 		m_Renderer.Render();
-
-		//float viewPlane = tan((120 / 2 * (180 / M_PI))) * 1 * 2;
-		//float distPerPixelX = viewPlane / m_ViewportWidth;
-		//float distPerPixelY = (m_ViewportHeight / m_ViewportWidth) * distPerPixelX;
-		//float distPerPixelY = distPerPixelX / 2;
-
-		//ImVec2 startPos = { -viewPlane / 2, distPerPixelY * m_ViewportHeight / 2 };
-		//ImVec4 dir;
-
-		//for (int y = 0; y < m_ViewportHeight; y++) {
-		//	for (int x = 0; x < m_ViewportWidth; x++) {
-		//		dir.x = -(startPos.x + x * distPerPixelX - position.x);
-		//		dir.y = -(startPos.y + y * distPerPixelY - position.y);
-		//		dir.z = -1;
-
-		//		Ray* ray = new Ray(position, dir);
-		//		ray->screenPos = ImVec2(x, y);
-		//		rays.push_back(ray);
-		//	}
-		//}
 		
 		m_LastRenderTime = timer.ElapsedMillis();
 	}

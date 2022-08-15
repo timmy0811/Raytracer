@@ -1,13 +1,27 @@
 #include "Renderer.h"
 
-uint32_t Renderer::PerPixel(glm::vec2 coord)
+namespace Utils {
+
+	static uint32_t ConvertToRGBA(const glm::vec4& color)
+	{
+		if (color.r > 0) {
+			int c = 0;
+		}
+		uint8_t r = (uint8_t)(color.r * 255.0f);
+		uint8_t g = (uint8_t)(color.g * 255.0f);
+		uint8_t b = (uint8_t)(color.b * 255.0f);
+		uint8_t a = (uint8_t)(color.a * 255.0f);
+
+		uint32_t result = (a << 24) | (b << 16) | (g << 8) | r;
+		return result;
+	}
+
+}
+
+glm::vec4 Renderer::PerPixel(glm::vec2 coord)
 {
-	/*uint8_t r = (uint8_t)(coord.x * 255.f);
-	uint8_t g = (uint8_t)(coord.y * 255.f);
-
-	return 0xff000000 | ( g << 8 ) | r;*/
-
 	glm::vec3 sphere(0.f, 0.f, 0.f);
+	glm::vec3 lightDir(0.5f, 0.7f, 0.f);
 
 	glm::vec3 rayOrig(0.f, 0.f, 1.f);
 	glm::vec3 rayDir(coord.x, coord.y, -1.f);
@@ -21,7 +35,7 @@ uint32_t Renderer::PerPixel(glm::vec2 coord)
 	// b = 2axbx + 2ayby + 2azbz - bxa - byb - bzc
 	float b = 2 * glm::dot(rayOrig, rayDir) - rayDir.x * sphere.x - rayDir.y * sphere.y - rayDir.z * sphere.z;
 	//float b = 2.f * glm::dot(rayOrig, rayDir);
-
+	
 	// c = ax^2 + ay^2 + az^2 - axa - ayb - azc - r^2
 	float c = glm::dot(rayOrig, rayOrig) - pow(radius, 2.f) - rayOrig.x * sphere.x - rayOrig.y * sphere.y - rayOrig.z * sphere.z;
 	//float c = glm::dot(rayOrig, rayOrig) - pow(radius, 2.f);
@@ -33,37 +47,28 @@ uint32_t Renderer::PerPixel(glm::vec2 coord)
 		float t2 = (-b - sqrt(disc)) / (2 * a);
 
 		float lowerT = std::min(t1, t2);
+		
+		glm::vec3 p = rayOrig + rayDir * lowerT;
 
-		glm::vec3 p;
-		p.x = rayOrig.x + rayDir.x * lowerT;
-		p.y = rayOrig.y + rayDir.y * lowerT;
-		p.z = rayOrig.z + rayDir.z * lowerT;
+		glm::vec3 normal = p - sphere;
+		glm::normalize(normal);
 
-		float growthZ = abs(- ((p.x - sphere.x) / std::sqrt(-pow(p.x - sphere.x, 2.f) - pow(p.y - sphere.y, 2.f) + radius * radius)));
-		float growthY = abs(-((p.x - sphere.x) / std::sqrt(-pow(p.x - sphere.x, 2.f) - pow(p.z - sphere.z, 2.f) + radius * radius)));
-
-		if (growthZ >= 1) growthZ = 1;
-		if (growthY >= 1) growthY = 1;
-
-		uint8_t b = 255 * growthZ;
-		uint8_t r = 255 * growthY;
-
-		return 0xff00ff00;
-		//return p;
+		//return glm::vec4(normal * 0.5f + 0.5f, 1.f);
+		return glm::vec4(normal * 0.5f + 0.5f, 1.f);
 	}
 	else if (disc == 0) {
 		float t1 = -b / (2 * a);
 
-		glm::vec3 p;
-		p.x = rayOrig.x + rayDir.x * t1;
-		p.y = rayOrig.y + rayDir.y * t1;
-		p.z = rayOrig.z + rayDir.z * t1;
+		glm::vec3 p = rayOrig + rayDir * t1;
 
-		return 0xffffff00;
-		//return p;
+		return glm::vec4(1.f, 1.f, 1.f, 1.f);
 	}
 	else {
-		return{};
+		// Sky gradient
+		float r = 1.f - ((255 - 110) * (1.f / 255.f) * ((coord.y + 1.f) / 2.f));
+		float g = 1.f - ((255 - 202) * (1.f / 255.f) * ((coord.y + 1.f) / 2.f));
+
+		return glm::vec4(r, g, 1.f, 1.f);
 	}
 }
 
@@ -89,7 +94,10 @@ void Renderer::Render()
 			glm::vec2 coord = { x / (float)m_ImageRendered->GetWidth(), y / (float)m_ImageRendered->GetHeight() };
 			coord.x *= formatFac;
 			coord = coord * 2.f - 1.f;
-			m_ImageData[x + y * m_ImageRendered->GetWidth()] = PerPixel(coord);
+
+			glm::vec4 color = PerPixel(coord);
+			color = glm::clamp(color, glm::vec4(0.0f), glm::vec4(1.0f));
+			m_ImageData[x + y * m_ImageRendered->GetWidth()] = Utils::ConvertToRGBA(color);
 		}
 	}
 
