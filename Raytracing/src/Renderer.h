@@ -2,9 +2,12 @@
 
 #include "Walnut/Image.h"
 
-#include <iostream>
 #include <memory>
+#include <vector>
 #include "glm/glm.hpp"
+
+#include "Sphere.h"
+#include "DirectLight.h"
 
 class Renderer
 {
@@ -14,8 +17,12 @@ private:
 
 	glm::vec4 PerPixel(glm::vec2 coord);
 
+	DirectLight light = DirectLight(glm::vec3(-1.f, -1.f, -0.5f));
+	std::vector<Hittable*> hittables = { new Sphere() };
+
 public:
 	Renderer() = default;
+	~Renderer();
 
 	void OnResize(uint32_t width, uint32_t height);
 	void Render();

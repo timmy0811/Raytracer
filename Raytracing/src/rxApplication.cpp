@@ -13,37 +13,6 @@
 
 using namespace Walnut;
 
-class Ray {
-private:
-	ImVec4 source;
-	ImVec4 direction;
-
-public:
-	Ray(ImVec4 source, ImVec4 direction)
-		:source(source), direction(direction)
-	{
-	}
-
-	ImVec2 screenPos;
-
-	ImVec4 getSource() { return source; }
-	ImVec4 getDirection() { return direction; }
-};
-
-class Sphere {
-private:
-	float radius;
-	ImVec4 position;
-
-public:
-	Sphere(float radius, ImVec4 position)
-		:radius(radius), position(position)
-	{
-	}
-
-	ImVec4 getIntersection(Ray ray);
-};
-
 class ExampleLayer : public Walnut::Layer
 {
 private:
