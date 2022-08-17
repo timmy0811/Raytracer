@@ -24,6 +24,10 @@ public:
 	Renderer() = default;
 	~Renderer();
 
+	glm::vec3* SpherePos();
+	glm::vec3* lightDir();
+	float* lightInt();
+
 	void OnResize(uint32_t width, uint32_t height);
 	void Render();
 

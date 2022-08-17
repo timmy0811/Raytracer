@@ -38,6 +38,22 @@ Renderer::~Renderer()
 	}
 }
 
+
+glm::vec3* Renderer::SpherePos()
+{
+	return hittables[0]->getPosition();
+}
+
+glm::vec3* Renderer::lightDir()
+{
+	return &(light.direction);
+}
+
+float* Renderer::lightInt()
+{
+	return &(light.intensity);
+}
+
 void Renderer::OnResize(uint32_t width, uint32_t height)
 {
 	if (m_ImageRendered) {

@@ -47,7 +47,7 @@ glm::vec4 Sphere::intersect(glm::vec2 coords, DirectLight light, glm::vec3 rayOr
 
 	glm::vec3 color(normal * 0.5f + 0.5f);
 	color = this->color;
-	float lightIntens = glm::max(glm::dot(normal, -light.direction), 0.0f);
+	float lightIntens = glm::max(glm::dot(normal, -light.direction), 1.f - light.intensity);
 
 	return glm::vec4(color * lightIntens, 1.f);
 }

@@ -8,5 +8,6 @@ public:
 	DirectLight(glm::vec3 direction);
 
 	glm::vec3 direction;
+	float intensity = 1.f;
 };
 

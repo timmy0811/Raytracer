@@ -5,3 +5,8 @@ Hittable::Hittable(glm::vec3 position, glm::vec4 color)
 {
 
 }
+
+glm::vec3* Hittable::getPosition()
+{
+	return &position;
+}

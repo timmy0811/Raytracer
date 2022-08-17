@@ -41,6 +41,19 @@ public:
 		if (ImGui::Button("Render")) {
 			Render();
 		}
+
+		ImGui::Separator();
+		ImGui::DragFloat("DirectLight X", &(m_Renderer.lightDir()->x), 0.05f, -1.f, 1.f);
+		ImGui::DragFloat("DirectLight Y", &(m_Renderer.lightDir()->y), 0.05f, -1.f, 1.f);
+		ImGui::DragFloat("DirectLight Z", &(m_Renderer.lightDir()->z), 0.05f, -1.f, 1.f);
+
+		ImGui::DragFloat("Shadow Casting", m_Renderer.lightInt(), 0.02f, 0.f, 1.f);
+
+		ImGui::Separator();
+		ImGui::DragFloat("Sphere X", &(m_Renderer.SpherePos()->x), 0.05f, -10.f, 10.f);
+		ImGui::DragFloat("Sphere Y", &(m_Renderer.SpherePos()->y), 0.05f, -10.f, 10.f);
+		ImGui::DragFloat("Sphere Z", &(m_Renderer.SpherePos()->z), 0.05f, -10.f, 10.f);
+
 		ImGui::End();
 
 		// Render viewport
