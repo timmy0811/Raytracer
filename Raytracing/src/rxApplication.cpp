@@ -71,7 +71,7 @@ public:
 		ImGui::End();
 		ImGui::PopStyleVar();
 
-		Render();
+		//Render();
 	}
 };
 

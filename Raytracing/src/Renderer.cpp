@@ -14,21 +14,33 @@ namespace Utils {
 	}
 }
 
-glm::vec4 Renderer::PerPixel(glm::vec2 coord)
+glm::vec4 Renderer::PerPixel(glm::vec2 coord, float toleranceX, float toleranceY)
 {
-	glm::vec4 color(-1.f, -1.f, -1.f, 1.f);
-	for (Hittable* hittable : hittables) {
-		color = glm::clamp(hittable->intersect(coord, light, glm::vec3(0.f, 0.f, 1.f)), glm::vec4(-1.0f), glm::vec4(1.0f));
-	}
+	glm::vec4 average(0.f);
 
-	//Sky gradient
-	if (color.x == -1.f) {
-		color.r = 1.f - ((255 - 110) * (1.f / 255.f) * ((coord.y + 1.f) / 2.f));
-		color.g = 1.f - ((255 - 202) * (1.f / 255.f) * ((coord.y + 1.f) / 2.f));
-		color.b = 1.f;
-	}
+	for (uint16_t sample = 0; sample < samplesPR; sample++) {
+		glm::vec4 color{1.f};
+		for (Hittable* hittable : hittables) {
+			coord.x += randomDouble(-toleranceX, toleranceX);
+			coord.y += randomDouble(-toleranceY, toleranceY);
+			color = glm::clamp(hittable->intersect(coord, light, glm::vec3(0.f, 0.f, 1.f)), glm::vec4(-1.0f), glm::vec4(1.0f));
 
-	return color;
+			//Sky gradient
+			if (color.x == -1.f) {
+				float step = (1.f / 255.f) * ((coord.y + 1.f) / 2.f);
+				color.r = 1.f - ((255 - 110) * step);
+				color.g = 1.f - ((255 - 202) * step);
+			}
+		}
+		average += color;
+	}
+	average /= (float)samplesPR;
+	return average;
+}
+
+double Renderer::randomDouble(float min, float max)
+{
+	return min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
 }
 
 Renderer::~Renderer()
@@ -37,7 +49,6 @@ Renderer::~Renderer()
 		delete hit;
 	}
 }
-
 
 glm::vec3* Renderer::SpherePos()
 {
@@ -71,12 +82,15 @@ void Renderer::OnResize(uint32_t width, uint32_t height)
 void Renderer::Render()
 {
 	float formatFac = (float)m_ImageRendered->GetWidth() / (float)m_ImageRendered->GetHeight();
+	float toleranceX = (1.f / (float)m_ImageRendered->GetWidth()) / 2.f;
+	float toleranceY = (1.f / (float)m_ImageRendered->GetHeight()) / 2.f;
+
 	for (unsigned int y = 0; y < m_ImageRendered->GetHeight(); y++) {
 		for (unsigned int x = 0; x < m_ImageRendered->GetWidth(); x++) {
 			glm::vec2 coord = { x / (float)m_ImageRendered->GetWidth(), y / (float)m_ImageRendered->GetHeight() };
 			coord.x *= formatFac;
 			coord = coord * 2.f - 1.f;
-			m_ImageData[x + y * m_ImageRendered->GetWidth()] = Utils::ConvertToRGBA(PerPixel(coord));
+			m_ImageData[x + y * m_ImageRendered->GetWidth()] = Utils::ConvertToRGBA(PerPixel(coord, toleranceX, toleranceY));
 		}
 	}
 
