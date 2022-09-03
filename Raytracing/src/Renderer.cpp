@@ -16,17 +16,51 @@ namespace Utils {
 
 glm::vec4 Renderer::PerPixel(glm::vec2 coord)
 {
-	glm::vec4 color(-1.f, -1.f, -1.f, 1.f);
-	for (Hittable* hittable : hittables) {
-		color = glm::clamp(hittable->intersect(coord, light, glm::vec3(0.f, 0.f, 1.f)), glm::vec4(-1.0f), glm::vec4(1.0f));
+	glm::vec3 baseColor(1.f, 1.f, 0.f);
+	glm::vec3 rayOrigin = glm::vec3(0.f, 0.f, 1.f);
+	glm::vec3 position = glm::vec3(0.f, 0.f, 0.f);
+	float radius = 0.5f;
+
+	glm::vec3 rayDirection(coord.x, coord.y, -1.f);
+
+	float a = glm::dot(rayDirection, rayDirection);
+	glm::vec3 oc = rayOrigin - position;
+	float b = glm::dot(oc, rayDirection) * 1.f;
+	float c = glm::dot(oc, oc) - pow(radius, 2.f);
+
+	float disc = pow(b, 2) - a * c;
+	if (disc < 0.f) return glm::vec4(0, 0, 0, 1);
+
+	float t0 = (-b - sqrt(disc)) / (2 * a);
+
+	glm::vec3 p = rayOrigin + rayDirection * t0;
+	glm::vec3 normal = p - position;
+	normal = glm::normalize(normal);
+
+	/*bool front_face;
+	if (glm::dot(rayDirection, normal) > 0.f) {
+		front_face = false;
+		normal = -normal;
 	}
+	else {
+		front_face = true;
+	}*/
+
+	//glm::vec4 color = glm::vec4(normal * 0.5f + 0.5f, 1.f);
+	float lightIntens = glm::max(glm::dot(normal, -light.direction), 1.f - light.intensity);
+
+	glm::vec4 color = glm::vec4(baseColor * lightIntens, 1.f);
+
+	/*for (Hittable* hittable : hittables) {
+		color = glm::clamp(hittable->intersect(coord, light, glm::vec3(0.f, 0.f, 1.f)), glm::vec4(-1.0f), glm::vec4(1.0f));
+	}*/
 
 	//Sky gradient
-	if (color.x == -1.f) {
+	/*if (color.x == -1.f) {
 		color.r = 1.f - ((255 - 110) * (1.f / 255.f) * ((coord.y + 1.f) / 2.f));
 		color.g = 1.f - ((255 - 202) * (1.f / 255.f) * ((coord.y + 1.f) / 2.f));
 		color.b = 1.f;
-	}
+	}*/
 
 	return color;
 }
